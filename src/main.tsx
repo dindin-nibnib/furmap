@@ -10,6 +10,7 @@ import {
 import Map from './routes/root/map';
 import Info from './routes/root/info';
 import Discord from "./routes/root/discord";
+import Geo from "./routes/root/geo";
 
 const router = createBrowserRouter([
 	{
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
 			{
 				path: "/discord",
 				element: <Discord />,
+			},
+			{
+				path: "/geo",
+				element: <Geo />,
 			}
 		]
 	}
