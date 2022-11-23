@@ -26,7 +26,7 @@ const Root = () => {
 							<Link to="/geo">Geo</Link>
 						</li>
 						<li>
-							<Link to="https://twitter.com/Furmap_net">Twitter</Link>
+							<a href={"https://twitter.com/Furmap_net"}>Twitter</a>
 						</li>
 					</ul>
 				</nav>
