@@ -9,8 +9,15 @@ import L from 'leaflet';
 import { useEffect } from "react";
 import markerImage from '/public/images/marker_small.png';
 import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
-const mcg = L.markerClusterGroup();
+const mcg = L.markerClusterGroup({
+	showCoverageOnHover: true,
+	zoomToBoundsOnClick: true,
+	spiderfyOnMaxZoom: true,
+
+});
 
 const icon = L.icon({
 	iconUrl: markerImage.src,
