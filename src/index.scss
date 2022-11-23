@@ -39,8 +39,45 @@ body {
     }
 
     main {
+      margin: 8px;
       margin-top: 56px;
       height: 100%;
+
+      h2 {
+        font-size: 3rem;
+      }
+
+      div.row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+
+        div.col {
+          display: flex;
+          flex-direction: column;
+          margin-right: 5rem;
+        }
+      }
+
+      button {
+        cursor: pointer;
+
+        &.accent {
+          background-color: #007bff;
+          color: white;
+          width: -moz-fit-content;
+          width: fit-content;
+          border: none;
+          font-size: 2rem;
+          padding: 5px;
+          border-radius: 5px;
+          transition: all 0.2s ease-in-out;
+
+          &:hover {
+            background-color: #0069d9;
+          }
+        }
+      }
     }
   }
 }

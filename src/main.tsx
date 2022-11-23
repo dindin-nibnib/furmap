@@ -9,19 +9,24 @@ import {
 } from 'react-router-dom';
 import Map from './routes/root/map';
 import Info from './routes/root/info';
+import Discord from "./routes/root/discord";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <Root/>,
+		element: <Root />,
 		children: [
 			{
 				path: "/",
-				element: <Map/>,
+				element: <Map />,
 			},
 			{
 				path: "/info",
-				element: <Info/>,
+				element: <Info />,
+			},
+			{
+				path: "/discord",
+				element: <Discord />,
 			}
 		]
 	}
@@ -29,6 +34,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
-		<RouterProvider router={router}/>
+		<RouterProvider router={router} />
 	</React.StrictMode>
 );
