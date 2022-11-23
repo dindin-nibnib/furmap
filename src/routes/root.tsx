@@ -30,8 +30,9 @@ const Root = () => {
 					</li>
 				</ul>
 			</nav>
-
-			<Outlet />
+			<main>
+				<Outlet />
+			</main>
 		</>
 	);
 };
