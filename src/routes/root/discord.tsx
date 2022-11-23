@@ -1,8 +1,6 @@
-import { Link } from "react-router-dom";
-
 const Discord = () => {
 	return (
-		<>
+		<div className={"margin"}>
 			<h2>Discord Server</h2>
 			<div className={"row"}>
 				<div className={"col"}>
@@ -20,7 +18,7 @@ const Discord = () => {
 						<li>This server is mainly to discuss about furmap, although you are allowed to talk about anything !</li>
 						<li>You can invite your friends on it !</li>
 					</ul>
-					<button className={"accent"}>
+					<button className={"accent"} onClick={() => { window.location.href = "https://discord.gg/fgjADKh"; }}>
 						Join the server
 					</button>
 				</div>
@@ -29,7 +27,7 @@ const Discord = () => {
 					<iframe title={"Discord server"} src="https://canary.discord.com/widget?id=684020556596510793&theme=dark" allowTransparency frameBorder={0} width={350} height={500} />
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 
