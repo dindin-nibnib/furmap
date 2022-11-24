@@ -1,13 +1,12 @@
 import ReCAPTCHA from "react-google-recaptcha";
 import React, {
 	useState,
-	useRef,
 	FormEvent,
 	useEffect
 } from "react";
 
 const Register = () => {
-	const recaptchaRef = useRef<ReCAPTCHA>();
+	const recaptchaRef = React.createRef<ReCAPTCHA>();
 	const [email, setEmail] = useState<string>("");
 	const [name, setName] = useState<string>("");
 	const [pos, setPos] = useState<{ lat: number, lng: number; }>({ lat: 0, lng: 0 });
