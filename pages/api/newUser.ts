@@ -58,18 +58,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			if (captchaValidation.success) {
 				var transport = nodemailer.createTransport({
 					host: "smtp.mailtrap.io",
-					port: 2525,
+					port: 587,
 					auth: {
-						user: "35a706f5e87899",
-						pass: "f59e72214f7f68"
-					}
+						user: "api",
+						pass: process.env.MAILTRAP_PASSWORD
+					},
 				});
 
 				const key = crypto.createHash('sha256').update(process.env.CHECKSUM_PHRASE + "|" + email).digest('base64');
 
 				var mailOptions = {
-					from: 'mail@example.com',
-					to: 'reciever@example.com',
+					from: 'furmap@dindin.ch',
+					to: email,
 					subject: 'New User',
 					html: `<h1>New User</h1>
 						<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
