@@ -64,7 +64,7 @@ const Register = () => {
 					"Content-Type": "application/json",
 				},
 			});
-			if (response.ok) {
+			if (response.status === 200) {
 				// If the response is ok than show the success alert
 				alert("Email registered successfully");
 			} else {
