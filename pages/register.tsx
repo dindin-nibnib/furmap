@@ -41,6 +41,11 @@ const Register = () => {
 			return;
 		}
 
+		if (pos.lat < -90 || pos.lat > 90 || pos.lng < -180 || pos.lng > 180) {
+			alert("Invalid location.");
+			return;
+		}
+
 		// Execute the reCAPTCHA when the form is submitted
 		recaptchaRef.current?.execute();
 	};
