@@ -40,7 +40,7 @@ const MarkerCluster = ({ markers }: { markers: { position: { lng: number, lat: n
 		);
 
 		// optionally center the map around the markers
-		// map.fitBounds(mcg.getBounds());
+		map.fitBounds(mcg.getBounds());
 		// // add the marker cluster group to the map
 		map.addLayer(mcg);
 	}, [markers, map]);
