@@ -8,6 +8,7 @@ export async function getServerSideProps() {
 	const db = client.db("furmap");
 	let markersRes = await db.collection("markers").find({}).toArray();
 	let markers = JSON.parse(JSON.stringify(markersRes)) as Array<any>;
+	client.close();
 
 	return {
 		props: { markers },
