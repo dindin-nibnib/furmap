@@ -50,7 +50,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				}
 			 */
 			if (captchaValidation.success) {
-				console.log(process.env.MAILTRAP_PASSWORD);
 				const ENDPOINT = "https://send.api.mailtrap.io/";
 				const client = new MailtrapClient({ endpoint: ENDPOINT, token: process.env.MAILTRAP_PASSWORD || "" });
 

@@ -22,8 +22,14 @@ const Register = () => {
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+
+		recaptchaRef.current?.execute();
+	};
+
+	const onReCAPTCHAChange = async (captchaCode: string | null) => {
 		setLoading(true);
 		if (recaptchaRef.current === null) {
+			alert("reCAPTCHA Ref is null");
 			setLoading(false);
 			return;
 		}
@@ -53,18 +59,13 @@ const Register = () => {
 			setLoading(false);
 			return;
 		}
-
-		// Execute the reCAPTCHA when the form is submitted
-		recaptchaRef.current?.execute();
-	};
-
-	const onReCAPTCHAChange = async (captchaCode: string | null) => {
 		// If the reCAPTCHA code is null or undefined indicating that
 		// the reCAPTCHA was expired then return early
 		if (!captchaCode) {
 			setLoading(false);
 			return;
 		}
+
 
 		try {
 			const response = await fetch("/api/newUser", {
@@ -74,9 +75,10 @@ const Register = () => {
 					"Content-Type": "application/json",
 				},
 			});
+			console.dir(response);
 			if (response.status === 200) {
 				// If the response is ok than show the success alert
-				alert("Email registered successfully");
+				alert("Success! You will receive an email shortly.");
 			} else {
 				// Else throw an error with the message returned
 				// from the API
@@ -123,19 +125,18 @@ const Register = () => {
 					</li>
 
 					<li>
-						<ReCAPTCHA
-							ref={recaptchaRef}
-							size={"invisible"}
-							sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-							onChange={onReCAPTCHAChange}
-						/>
-					</li>
-
-					<li>
-						<button type="submit" disabled={loading}>{loading ? "Loading..." : "Register"}</button>
+						<button type="submit" disabled={loading}>
+							{loading ? "Loading..." : "Register"}
+						</button>
 					</li>
 				</ul>
 			</form>
+			<ReCAPTCHA
+				size={"invisible"}
+				ref={recaptchaRef}
+				sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+				onChange={onReCAPTCHAChange}
+			/>
 		</>
 	);
 };
