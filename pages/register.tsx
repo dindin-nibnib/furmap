@@ -107,21 +107,29 @@ const Register = () => {
 			<form onSubmit={handleSubmit} method={"POST"} action={"/api/newUser"}>
 				<ul>
 					<li>
-						<label htmlFor="name">Name</label>
-						<input value={name} onChange={(e) => { setName(e.target.value); }} type="text" name="name" id="name" />
+						<div>
+							<label htmlFor="name">Name</label>
+							<input value={name} onChange={(e) => { setName(e.target.value); }} type="text" name="name" id="name" />
+						</div>
 					</li>
 
 					<li>
-						<label htmlFor="email">E-mail (used for verification)</label>
-						<input value={email} onChange={(e) => { setEmail(e.target.value); }} type="text" name="email" id="email" />
+						<div>
+							<label htmlFor="email">E-mail (used for verification)</label>
+							<input value={email} onChange={(e) => { setEmail(e.target.value); }} type="text" name="email" id="email" />
+						</div>
 					</li>
 
 					<li>
-						<label htmlFor="lat">Latitude</label>
-						<input value={pos.lat} onChange={(e) => { setPos({ lat: Number(e.target.value), lng: pos.lng }); }} type="number" name="lat" id="lat" />
+						<div>
+							<label htmlFor="lat">Latitude</label>
+							<input value={pos.lat} onChange={(e) => { setPos({ lat: Number(e.target.value), lng: pos.lng }); }} type="number" name="lat" id="lat" />
+						</div>
 
-						<label htmlFor="lng">Longitude</label>
-						<input value={pos.lng} onChange={(e) => { setPos({ lat: pos.lat, lng: Number(e.target.value) }); }} type="number" name="lng" id="lng" />
+						<div>
+							<label htmlFor="lng">Longitude</label>
+							<input value={pos.lng} onChange={(e) => { setPos({ lat: pos.lat, lng: Number(e.target.value) }); }} type="number" name="lng" id="lng" />
+						</div>
 					</li>
 
 					<li>

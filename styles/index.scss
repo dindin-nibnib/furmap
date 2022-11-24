@@ -95,6 +95,19 @@ body {
       }
 
       button {
+        background-color: #fff;
+        color: #000;
+        border: none;
+        padding: 1rem;
+        border-radius: 5px;
+        font-size: 1.5rem;
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+          background-color: #000;
+          color: #fff;
+          border: 1px solid #fff;
+        }
         cursor: pointer;
 
         &.accent {
@@ -106,10 +119,39 @@ body {
           font-size: 2rem;
           padding: 5px;
           border-radius: 5px;
-          transition: all 0.2s ease-in-out;
 
           &:hover {
             background-color: #0069d9;
+          }
+        }
+      }
+      form {
+        ul {
+          list-style: none;
+          li {
+            display: flex;
+            flex-direction: row;
+            div {
+              margin-left: 1rem;
+              input {
+                display: block;
+                margin-bottom: 1rem;
+              }
+            }
+          }
+        }
+        button {
+          background-color: white;
+          color: black;
+          width: -moz-fit-content;
+          width: fit-content;
+          border: none;
+          font-size: 2rem;
+          padding: 5px;
+          border-radius: 5px;
+
+          &:hover {
+            background-color: green;
           }
         }
       }
