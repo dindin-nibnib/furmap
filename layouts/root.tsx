@@ -33,7 +33,7 @@ const Root = ({ children }: { children: JSX.Element; }) => {
 				</nav>
 			</header>
 
-			<main>
+			<main style={{ position: "relative" }}>
 				{children}
 			</main>
 		</>

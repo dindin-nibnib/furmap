@@ -39,8 +39,28 @@ body {
     }
 
     main {
-      padding-top: 56px;
+      margin-top: 56px;
       height: 100%;
+
+      .float-abs {
+        position: absolute;
+      }
+
+      .fl-left {
+        left: 0;
+      }
+
+      .fl-right {
+        right: 0;
+      }
+
+      .fl-top {
+        top: 0;
+      }
+
+      .fl-bottom {
+        bottom: 0;
+      }
 
       .margin {
         margin: 8px;

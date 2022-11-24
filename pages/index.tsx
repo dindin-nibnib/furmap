@@ -22,9 +22,12 @@ const MapComponent = dynamic(
 
 const Map = ({ markers }: { markers: { position: { lng: number, lat: number; }, name: string, _id: number; }[]; }) => {
 	return (
-		<Suspense>
-			<MapComponent markers={markers} />
-		</Suspense>
+		<>
+			<Suspense>
+				<MapComponent markers={markers} />
+			</Suspense>
+			<button className={"float-abs fl-top fl-right"} style={{ zIndex: 1000 }} onClick={() => { window.location.href = "/register"; }}>Register</button>
+		</>
 	);
 };
 
