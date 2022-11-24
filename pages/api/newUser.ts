@@ -1,13 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import nodemailer from "nodemailer";
 import crypto from 'crypto';
 import { MongoClient } from 'mongodb';
-
-const sleep = () => new Promise<void>((resolve) => {
-	setTimeout(() => {
-		resolve();
-	}, 350);
-});
+import { MailtrapClient } from "mailtrap";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { body, method } = req;
@@ -56,34 +50,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				}
 			 */
 			if (captchaValidation.success) {
-				var transport = nodemailer.createTransport({
-					host: "smtp.mailtrap.io",
-					port: 2525,
-					auth: {
-						user: "35a706f5e87899",
-						pass: "f59e72214f7f68"
+				console.log(process.env.MAILTRAP_PASSWORD);
+				const ENDPOINT = "https://send.api.mailtrap.io/";
+				const client = new MailtrapClient({ endpoint: ENDPOINT, token: process.env.MAILTRAP_PASSWORD || "" });
+
+				const sender = {
+					email: "furmap@dindin.ch",
+					name: "Furmap registration service",
+				};
+
+				const recipients = [
+					{
+						email,
 					}
-				});
+				];
 
 				const key = crypto.createHash('sha256').update(process.env.CHECKSUM_PHRASE + "|" + email).digest('base64');
 
-				var mailOptions = {
-					from: 'mail@example.com',
-					to: 'reciever@example.com',
-					subject: 'New User',
-					html: `<h1>New User</h1>
+				await client
+					.send({
+						from: sender,
+						to: recipients,
+						subject: "Furmap verification",
+						html: `<html><h1>New User</h1>
 						<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
 						<a href="https://${req.headers.host}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&pos=${encodeURIComponent(JSON.stringify(pos))}&email=${encodeURIComponent(email)}">Confirm Email</a>
-						<p>Thanks for subscribing!</p>`
-				};
-
-				transport.sendMail(mailOptions, (err, res) => {
-					if (err) {
-						console.log(err);
-					} else {
-						console.log(res);
-					}
-				});
+						<p>Thanks for subscribing!</p>`,
+						category: "Registration",
+					});
 
 				// Return 200 if everything is successful
 				return res.status(200).send("OK");
