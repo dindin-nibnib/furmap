@@ -110,7 +110,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			let client = new MongoClient(uri, {});
 			await client.connect();
 			const db = client.db('furmap');
-			await db.collection('markers').insertOne({
+			const collection = await db.collection('markers');
+
+			if (collection.findOne({ email }) !== null) {
+				return res.status(422).json({
+					message: "Email already exists",
+				});
+			}
+
+			collection.insertOne({
 				"_id": undefined,
 				"position": JSON.parse(pos.toString()),
 				"name": name.toString(),
