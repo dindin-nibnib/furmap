@@ -2,22 +2,47 @@ import ReCAPTCHA from "react-google-recaptcha";
 import React, {
 	useState,
 	useRef,
-	FormEvent
+	FormEvent,
+	useEffect
 } from "react";
 
 const Register = () => {
-	const recaptchaRef = React.createRef<ReCAPTCHA>();
-	const [email, setEmail] = React.useState<string>("");
-	const [name, setName] = React.useState<string>("");
-	const [pos, setPos] = React.useState<{ lat: number, lng: number; }>({ lat: 0, lng: 0 });
+	const recaptchaRef = useRef<ReCAPTCHA>();
+	const [email, setEmail] = useState<string>("");
+	const [name, setName] = useState<string>("");
+	const [pos, setPos] = useState<{ lat: number, lng: number; }>({ lat: 0, lng: 0 });
+	useEffect(() => {
+		try {
+			navigator?.geolocation.getCurrentPosition((pos) => {
+				setPos({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+			});
+		} catch (e) { console.log(e); }
+	}, []);
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (recaptchaRef.current === null)
 			return;
 
+		if (email === "" || name === "" || pos.lat === 0 || pos.lng === 0) {
+			alert("Please fill out all fields.");
+			return;
+		}
+
+		if (!(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/).test(email)) {
+			alert("Please enter a valid email address.");
+			return;
+		}
+
+		const tempEmail = await fetch("https://disposable.debounce.io/?email=" + email);
+
+		if ((await tempEmail.json()).disposable) {
+			alert("Please use a non-disposable email address.");
+			return;
+		}
+
 		// Execute the reCAPTCHA when the form is submitted
-		recaptchaRef.current.execute();
+		recaptchaRef.current?.execute();
 	};
 
 	const onReCAPTCHAChange = async (captchaCode: string | null) => {
