@@ -10,6 +10,8 @@ const Register = () => {
 	const [email, setEmail] = useState<string>("");
 	const [name, setName] = useState<string>("");
 	const [pos, setPos] = useState<{ lat: number, lng: number; }>({ lat: 0, lng: 0 });
+	const [loading, setLoading] = useState<boolean>(false);
+
 	useEffect(() => {
 		try {
 			navigator?.geolocation.getCurrentPosition((pos) => {
@@ -20,16 +22,21 @@ const Register = () => {
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (recaptchaRef.current === null)
+		setLoading(true);
+		if (recaptchaRef.current === null) {
+			setLoading(false);
 			return;
+		}
 
 		if (email === "" || name === "" || pos.lat === 0 || pos.lng === 0) {
 			alert("Please fill out all fields.");
+			setLoading(false);
 			return;
 		}
 
 		if (!(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/).test(email)) {
 			alert("Please enter a valid email address.");
+			setLoading(false);
 			return;
 		}
 
@@ -37,11 +44,13 @@ const Register = () => {
 
 		if ((await tempEmail.json()).disposable === "true") {
 			alert("Please use a non-disposable email address.");
+			setLoading(false);
 			return;
 		}
 
 		if (pos.lat < -90 || pos.lat > 90 || pos.lng < -180 || pos.lng > 180) {
 			alert("Invalid location.");
+			setLoading(false);
 			return;
 		}
 
@@ -53,6 +62,7 @@ const Register = () => {
 		// If the reCAPTCHA code is null or undefined indicating that
 		// the reCAPTCHA was expired then return early
 		if (!captchaCode) {
+			setLoading(false);
 			return;
 		}
 
@@ -75,11 +85,16 @@ const Register = () => {
 			}
 		} catch (error: any) {
 			alert(error?.message || "Something went wrong");
+			setLoading(false);
 		} finally {
 			// Reset the reCAPTCHA when the request has failed or succeeeded
 			// so that it can be executed again if user submits another email.
 			recaptchaRef.current?.reset();
 			setEmail("");
+			setName("");
+
+			// Set the loading state to false so that the form can be submitted again
+			setLoading(false);
 		}
 
 	};
@@ -117,7 +132,7 @@ const Register = () => {
 					</li>
 
 					<li>
-						<button type="submit">Register</button>
+						<button type="submit" disabled={loading}>{loading ? "Loading..." : "Register"}</button>
 					</li>
 				</ul>
 			</form>
