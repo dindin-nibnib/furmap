@@ -1,10 +1,13 @@
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import clientPromise from '../lib/mongodb';
 import 'leaflet/dist/leaflet.css';
+import { MongoClient } from 'mongodb';
+
 
 export async function getServerSideProps() {
-	const client = await clientPromise;
+	const uri = process.env.MONGO_CONNECTION_STRING || "";
+	let client = new MongoClient(uri, {});
+	await client.connect();
 	const db = client.db("furmap");
 	let markersRes = await db.collection("markers").find({}).toArray();
 	let markers = JSON.parse(JSON.stringify(markersRes)) as Array<any>;
