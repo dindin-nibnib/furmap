@@ -36,7 +36,7 @@ const Register = () => {
 
 		const tempEmail = await fetch("https://disposable.debounce.io/?email=" + email);
 
-		if ((await tempEmail.json()).disposable) {
+		if ((await tempEmail.json()).disposable === "true") {
 			alert("Please use a non-disposable email address.");
 			return;
 		}

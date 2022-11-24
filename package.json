@@ -11,8 +11,10 @@
   "dependencies": {
     "@types/leaflet": "^1.9.0",
     "@types/node": "18.11.9",
+    "@types/nodemailer": "^6.4.6",
     "@types/react-google-recaptcha": "^2.1.5",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dns": "^0.2.2",
     "eslint-config-next": "^13.0.4",
     "fs": "^0.0.1-security",
@@ -21,6 +23,7 @@
     "mongodb": "^4.12.0",
     "net": "^1.0.2",
     "next": "^13.0.4",
+    "nodemailer": "^6.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-google-recaptcha": "^2.1.0",
