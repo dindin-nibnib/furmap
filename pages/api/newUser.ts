@@ -24,6 +24,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		try {
+			const client = await clientPromise;
+			const db = client.db('furmap');
+			const collection = db.collection('markers');
+			if (await collection.findOne({ email: email }) !== null) {
+				return res.status(422).json({
+					message: "Email already exists",
+				});
+			}
+
 			// Ping the google recaptcha verify API to verify the captcha code you received
 			const response = await fetch(
 				`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captcha}`,
