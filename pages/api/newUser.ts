@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
 import crypto from 'crypto';
-import clientPromise from '../../lib/mongodb';
+import { MongoClient } from 'mongodb';
 
 const sleep = () => new Promise<void>((resolve) => {
 	setTimeout(() => {
@@ -24,7 +24,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		try {
-			const client = await clientPromise;
+			const uri = process.env.MONGO_CONNECTION_STRING || "";
+			let client = new MongoClient(uri, {});
+			await client.connect();
 			const db = client.db('furmap');
 			const collection = db.collection('markers');
 			if (await collection.findOne({ email: email }) !== null) {
@@ -111,7 +113,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				});
 			}
 
-			const client = await clientPromise;
+			const uri = process.env.MONGO_CONNECTION_STRING || "";
+			let client = new MongoClient(uri, {});
+			await client.connect();
 			const db = client.db('furmap');
 			await db.collection('markers').insertOne({
 				"_id": undefined,
