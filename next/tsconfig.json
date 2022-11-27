@@ -27,7 +27,9 @@
 		"pages/discord.tsx",
 		"pages/geo.tsx",
 		"pages/info.tsx",
-		"pages/root.tsx"
+		"pages/root.tsx",
+		"../src/root.tsx",
+		"../src/root.tsx"
 	],
 	"exclude": [
 		"node_modules"

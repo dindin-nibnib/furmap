@@ -1,6 +1,5 @@
-import geoRef from "../public/images/Ref_Geo_Furmap.png";
-import geoStick from "../public/images/Stick_Geo_Furmap.png";
-import Image from "next/image";
+import geoRef from "/src/images/Ref_Geo_Furmap.png";
+import geoStick from "/src/images/Stick_Geo_Furmap.png";
 
 const Geo = () => {
 	return (
@@ -25,9 +24,9 @@ const Geo = () => {
 					Add the sticker pack on Telegram <a href="https://t.me/addstickers/furmap">https://t.me/addstickers/furmap</a>
 				</li>
 			</ul>
-			<Image className={"big"} src={geoRef} alt="Furmap mascot reference sheet" />
+			<img className={"big"} src={geoRef} alt="Furmap mascot reference sheet" />
 			<br />
-			<Image className={"big"} src={geoStick} alt="furmap mascot sticker sheet" />
+			<img className={"big"} src={geoStick} alt="furmap mascot sticker sheet" />
 
 		</div>
 	);
