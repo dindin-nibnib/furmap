@@ -4,19 +4,35 @@
 
 import { serve } from "http://deno.land/std@0.131.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import SHA256 from "https://cdn.jsdelivr.net/npm/crypto-js/sha256.js";
-import Base64 from "https://cdn.jsdelivr.net/npm/crypto-js/enc-base64.js";
-import { MailtrapClient } from "https://esm.sh/mailtrap@3.0.1";
+import SHA256 from "https://cdn.jsdelivr.net/npm/crypto-js/sha256.js/+esm";
+import Base64 from "https://cdn.jsdelivr.net/npm/crypto-js/enc-base64.js/+esm";
+import { SmtpClient } from 'https://deno.land/x/denomailer@0.12.0/mod.ts';
+
+const corsHeaders = {
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, referer, user-agent, sec-ch-ua, sec-ch-ua-mobile, sec-ch-ua-platform',
+};
+const smtp = new SmtpClient();
 
 serve(async (req) => {
 	const { url, method, headers } = req;
+
+	if (method === "OPTIONS") {
+		return new Response('ok', {
+			status: 200,
+			headers: {
+				...corsHeaders,
+				'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+			},
+		});
+	}
 	const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 	const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
 	const supabase = createClient(supabaseUrl, supabaseAnonKey, { db: { schema: "public" } });
 	const body = await req.json();
 
-	const taskPattern = new URLPattern({ pathname: '/restful-tasks/:id' });
+	const taskPattern = new URLPattern({ pathname: '/register/:id' });
 	const matchingPath = taskPattern.exec(url);
 	const id = matchingPath ? matchingPath.pathname.groups.id : null;
 
@@ -29,6 +45,7 @@ serve(async (req) => {
 			}), {
 				status: 422,
 				headers: {
+					...corsHeaders,
 					"Content-Type": "application/json",
 				},
 			});
@@ -38,6 +55,7 @@ serve(async (req) => {
 			`https://www.google.com/recaptcha/api/siteverify?secret=${Deno.env.get("RECAPTCHA_SECRET_KEY")}&response=${captcha}`,
 			{
 				headers: {
+					...corsHeaders,
 					"Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
 				},
 				method: "POST",
@@ -51,6 +69,7 @@ serve(async (req) => {
 			}), {
 				status: 422,
 				headers: {
+					...corsHeaders,
 					"Content-Type": "application/json",
 				},
 			});
@@ -58,45 +77,63 @@ serve(async (req) => {
 
 		const { data } = await supabase.from('markers').select('name').eq('email', email);
 		if (data.length > 0) {
-			return new Response(JSON.stringify({ error: "Email already exists" }), {
+			return new Response(JSON.stringify({ message: "Email already exists" }), {
 				status: 400,
 				headers: {
+					...corsHeaders,
 					"content-type": "application/json",
 				},
 			});
 		}
 
-		const ENDPOINT = "https://send.api.mailtrap.io/";
-		const client = new MailtrapClient({ endpoint: ENDPOINT, token: Deno.env.get("MAILTRAP_PASSWORD") || "" });
+		await smtp.connect({
+			hostname: Deno.env.get('SMTP_HOSTNAME')!,
+			port: Number(Deno.env.get('SMTP_PORT')!),
+			username: Deno.env.get('SMTP_USERNAME')!,
+			password: Deno.env.get('SMTP_PASSWORD')!,
+		});
 
-		const sender = {
-			email: "furmap@dindin.ch",
-			name: "Furmap registration service",
-		};
+		const sender = "furmap@dindin.ch";
 
-		const recipients = [
-			{
-				email,
-			}
-		];
+		const key = Base64.stringify(SHA256(Deno.env.get("CHECKSUM_PHRASE") + "|" + email));
 
-		const key = Base64.stringify(SHA256(process.env.CHECKSUM_PHRASE + "|" + email));
-
-		await client
-			.send({
+		try {
+			await smtp.send({
 				from: sender,
-				to: recipients,
-				subject: "Furmap verification",
+				to: email,
+				subject: `Furmap verification`,
 				html: `<html><h1>New User</h1>
 				<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
-				<a href="https://${headers.host}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&pos=${encodeURIComponent(JSON.stringify(pos))}&email=${encodeURIComponent(email)}">Confirm Email</a>
+				<a href="https://${headers.host}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&email=${encodeURIComponent(email)}">Confirm Email</a>
 				<p>Thanks for subscribing!</p>`,
-				category: "Registration",
 			});
+		} catch (error) {
+			return new Response(
+				JSON.stringify({ message: "Error during smtp sending:" + error.message }), {
+				status: 400,
+				headers: {
+					...corsHeaders,
+					"content-type": "application/json",
+				},
+			});
+		}
 
 		return new Response(
-			JSON.stringify(res),
-			{ headers: { "Content-Type": "application/json" } },
+			JSON.stringify({ message: "Email sent" }),
+			{
+				headers: {
+					...corsHeaders,
+					"Content-Type": "application/json"
+				}
+			},
 		);
+	} else {
+		return new Response(JSON.stringify({ message: "Invalid request" }), {
+			status: 400,
+			headers: {
+				...corsHeaders,
+				"content-type": "application/json",
+			},
+		});
 	}
 });

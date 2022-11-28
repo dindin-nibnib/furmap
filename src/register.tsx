@@ -68,11 +68,14 @@ const Register = () => {
 
 
 		try {
-			const response = await fetch("/api/newUser", {
+			const response = await fetch("https://jdxdyhjehwnwmxielkny.functions.supabase.co/register/send", {
 				method: "POST",
-				body: JSON.stringify({ email, name, pos, captcha: captchaCode }),
+				body: JSON.stringify({ email, name, lat: pos.lat, lng: pos.lng, captcha: captchaCode }),
 				headers: {
 					"Content-Type": "application/json",
+					"Access-Control-Request-Method": "POST",
+					"Authorization": "Bearer " + import.meta.env.VITE_SUPABASE_ANON_KEY,
+					"Access-Control-Request-Headers": "Content-Type, Authorization"
 				},
 			});
 			console.dir(response);
@@ -82,7 +85,7 @@ const Register = () => {
 			} else {
 				// Else throw an error with the message returned
 				// from the API
-				const error = await response.json();
+				const { error } = await response.json();
 				throw new Error(error.message);
 			}
 		} catch (error: any) {
@@ -142,7 +145,7 @@ const Register = () => {
 			<ReCAPTCHA
 				size={"invisible"}
 				ref={recaptchaRef}
-				sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+				sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ""}
 				onChange={onReCAPTCHAChange}
 			/>
 		</>
