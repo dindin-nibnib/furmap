@@ -33,6 +33,28 @@ serve(async (req) => {
 			});
 		}
 
+		const response = await fetch(
+			`https://www.google.com/recaptcha/api/siteverify?secret=${Deno.env.get("RECAPTCHA_SECRET_KEY")}&response=${captcha}`,
+			{
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+				},
+				method: "POST",
+			}
+		);
+		const captchaValidation = await response.json();
+
+		if (!captchaValidation.success) {
+			return new Response(JSON.stringify({
+				message: "Unproccesable request, Invalid captcha code",
+			}), {
+				status: 422,
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+		}
+
 		const { data } = await supabase.from('markers').select('name').eq('email', email);
 		if (data.length > 0) {
 			return new Response(JSON.stringify({ error: "Email already exists" }), {
