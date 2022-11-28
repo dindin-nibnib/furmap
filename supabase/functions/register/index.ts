@@ -4,11 +4,12 @@
 
 import { serve } from "http://deno.land/std@0.131.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import crypto from "https://esm.sh/crypto@1.0.1";
+import SHA256 from "https://cdn.jsdelivr.net/npm/crypto-js/sha256.js";
+import Base64 from "https://cdn.jsdelivr.net/npm/crypto-js/enc-base64.js";
 import { MailtrapClient } from "https://esm.sh/mailtrap@3.0.1";
 
 serve(async (req) => {
-	const { url, method } = req;
+	const { url, method, headers } = req;
 	const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 	const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
@@ -64,6 +65,34 @@ serve(async (req) => {
 				},
 			});
 		}
+
+		const ENDPOINT = "https://send.api.mailtrap.io/";
+		const client = new MailtrapClient({ endpoint: ENDPOINT, token: Deno.env.get("MAILTRAP_PASSWORD") || "" });
+
+		const sender = {
+			email: "furmap@dindin.ch",
+			name: "Furmap registration service",
+		};
+
+		const recipients = [
+			{
+				email,
+			}
+		];
+
+		const key = Base64.stringify(SHA256(process.env.CHECKSUM_PHRASE + "|" + email));
+
+		await client
+			.send({
+				from: sender,
+				to: recipients,
+				subject: "Furmap verification",
+				html: `<html><h1>New User</h1>
+				<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
+				<a href="https://${headers.host}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&pos=${encodeURIComponent(JSON.stringify(pos))}&email=${encodeURIComponent(email)}">Confirm Email</a>
+				<p>Thanks for subscribing!</p>`,
+				category: "Registration",
+			});
 
 		return new Response(
 			JSON.stringify(res),
