@@ -104,7 +104,7 @@ serve(async (req) => {
 				subject: `Furmap verification`,
 				html: `<html><h1>New User</h1>
 				<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
-				<a href="https://${headers.host}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&email=${encodeURIComponent(email)}">Confirm Email</a>
+				<a href="https://${new URL(url).hostname}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&email=${encodeURIComponent(email)}">Confirm Email</a>
 				<p>Thanks for subscribing!</p>`,
 			});
 		} catch (error) {
