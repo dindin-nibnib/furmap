@@ -4,6 +4,7 @@ import React, {
 	FormEvent,
 	useEffect
 } from "react";
+import { supabase } from "./supabaseClient";
 
 const Register = () => {
 	const recaptchaRef = React.createRef<ReCAPTCHA>();
@@ -68,21 +69,16 @@ const Register = () => {
 
 
 		try {
-			const response = await fetch("/api/newUser", {
-				method: "POST",
-				body: JSON.stringify({ email, name, pos, captcha: captchaCode }),
-				headers: {
-					"Content-Type": "application/json",
-				},
+			const response = await supabase.functions.invoke("register", {
+				body: { email, name, lat: pos.lat, lng: pos.lng, captcha: captchaCode },
 			});
-			console.dir(response);
-			if (response.status === 200) {
+			if (!response.error) {
 				// If the response is ok than show the success alert
 				alert("Success! You will receive an email shortly.");
 			} else {
 				// Else throw an error with the message returned
 				// from the API
-				const error = await response.json();
+				const { error } = response.error;
 				throw new Error(error.message);
 			}
 		} catch (error: any) {
@@ -142,7 +138,7 @@ const Register = () => {
 			<ReCAPTCHA
 				size={"invisible"}
 				ref={recaptchaRef}
-				sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+				sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ""}
 				onChange={onReCAPTCHAChange}
 			/>
 		</>
