@@ -2,8 +2,8 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve, type Handler } from "http://deno.land/std@0.131.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.1.1";
 import SHA256 from "https://cdn.jsdelivr.net/npm/crypto-js/sha256.js/+esm";
 import Base64 from "https://cdn.jsdelivr.net/npm/crypto-js/enc-base64.js/+esm";
 import { SmtpClient } from 'https://deno.land/x/denomailer@0.12.0/mod.ts';
@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 const smtp = new SmtpClient();
 
-serve(async (req: Request): Handler => {
+serve(async (req: Request): Promise<Response> => {
 	const { url, method, headers } = req;
 
 	if (method === "OPTIONS") {
@@ -76,7 +76,7 @@ serve(async (req: Request): Handler => {
 		}
 
 		const { data } = await supabase.from('markers').select('name').eq('email', email);
-		if (data.length > 0) {
+		if ((data?.length || 0) > 0) {
 			return new Response(JSON.stringify({ message: "Email already exists" }), {
 				status: 400,
 				headers: {
@@ -160,7 +160,7 @@ serve(async (req: Request): Handler => {
 
 		const { data } = await supabase.from('markers').select('name').eq('email', email);
 		console.log(data);
-		if (data.length > 0) {
+		if ((data?.length || 0) > 0) {
 			return new Response(JSON.stringify({ message: "Email already exists" }), {
 				status: 400,
 				headers: {
