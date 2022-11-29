@@ -8,6 +8,7 @@ import Info from "./info";
 import Discord from "./discord";
 import Geo from "./geo";
 import Root from './root';
+import Confirm from './confirm';
 
 const routes = createBrowserRouter([
 	{
@@ -34,6 +35,10 @@ const routes = createBrowserRouter([
 				path: '/geo',
 				element: <Geo />,
 			},
+			{
+				path: '/confirm',
+				element: <Confirm />
+			}
 		]
 	},
 ]);

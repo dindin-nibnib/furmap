@@ -2,7 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from "http://deno.land/std@0.131.0/http/server.ts";
+import { serve, type Handler } from "http://deno.land/std@0.131.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import SHA256 from "https://cdn.jsdelivr.net/npm/crypto-js/sha256.js/+esm";
 import Base64 from "https://cdn.jsdelivr.net/npm/crypto-js/enc-base64.js/+esm";
@@ -14,7 +14,7 @@ const corsHeaders = {
 };
 const smtp = new SmtpClient();
 
-serve(async (req) => {
+serve(async (req: Request): Handler => {
 	const { url, method, headers } = req;
 
 	if (method === "OPTIONS") {
@@ -104,13 +104,13 @@ serve(async (req) => {
 				subject: `Furmap verification`,
 				html: `<html><h1>New User</h1>
 				<p>Hello, ${name}! You have been added to the Map. Please click the link below to confirm your email address.</p>
-				<a href="https://${new URL(url).hostname}/api/newUser?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&email=${encodeURIComponent(email)}">Confirm Email</a>
+				<a href="${headers.get("origin")}/confirm?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}&lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}&email=${encodeURIComponent(email)}">Confirm Email</a>
 				<p>Thanks for subscribing!</p>`,
 			});
 		} catch (error) {
 			return new Response(
 				JSON.stringify({ message: "Error during smtp sending:" + error.message }), {
-				status: 400,
+				status: 500,
 				headers: {
 					...corsHeaders,
 					"content-type": "application/json",
@@ -121,6 +121,80 @@ serve(async (req) => {
 		return new Response(
 			JSON.stringify({ message: "Email sent" }),
 			{
+				headers: {
+					...corsHeaders,
+					"Content-Type": "application/json"
+				}
+			},
+		);
+	} else if (id === "verify") {
+		const { key, name, lat, lng, email } = body;
+
+		if (!key || !name || !lat || !lng || !email) {
+			return new Response(JSON.stringify({
+				message: "Unproccesable request, please provide the required fields",
+			}), {
+				status: 422,
+				headers: {
+					...corsHeaders,
+					"Content-Type": "application/json",
+				},
+			});
+		}
+
+		const checksum = Base64.stringify(SHA256(Deno.env.get("CHECKSUM_PHRASE") + "|" + email));
+		if (checksum !== key) {
+			return new Response(JSON.stringify({
+				message: "Unproccesable request, invalid key",
+			}), {
+				status: 422,
+				headers: {
+					...corsHeaders,
+					"Content-Type": "application/json",
+				},
+			});
+		}
+
+		const { data } = await supabase.from('markers').select('name').eq('email', email);
+		if (data.length > 0) {
+			return new Response(JSON.stringify({ message: "Email already exists" }), {
+				status: 400,
+				headers: {
+					...corsHeaders,
+					"content-type": "application/json",
+				},
+			});
+		}
+
+		const supabaseUrl = Deno.env.get("VITE_SUPABASE_URL") || "";
+		const supabaseServiceKey = Deno.env.get("SERVICE_KEY") || "";
+
+
+		const insertClient = createClient(supabaseUrl, supabaseServiceKey);
+
+		const { error } = await insertClient.from('markers').insert(
+			{
+				name,
+				lat,
+				lng,
+				email,
+			}
+		);
+
+		if (error) {
+			return new Response(JSON.stringify({ message: "Error during insert" }), {
+				status: 500,
+				headers: {
+					...corsHeaders,
+					"content-type": "application/json",
+				},
+			});
+		}
+
+		return new Response(
+			JSON.stringify({ message: "Email verified" }),
+			{
+				status: 200,
 				headers: {
 					...corsHeaders,
 					"Content-Type": "application/json"
