@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
+import { supabase } from './supabaseClient';
 
 
 const Confirm = () => {
@@ -7,6 +8,7 @@ const Confirm = () => {
 	const [confirmed, setConfirmed] = useState<boolean | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	useEffect(() => {
+		supabase.functions.invoke("verify");
 		console.log("effect!");
 		fetch(`https://${import.meta.env.VITE_PROJECT_ID}.functions.supabase.co/register/verify${route.search}`, {
 			method: "GET",

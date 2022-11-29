@@ -4,6 +4,7 @@ import React, {
 	FormEvent,
 	useEffect
 } from "react";
+import { supabase } from "./supabaseClient";
 
 const Register = () => {
 	const recaptchaRef = React.createRef<ReCAPTCHA>();
@@ -68,24 +69,23 @@ const Register = () => {
 
 
 		try {
-			const response = await fetch("https://jdxdyhjehwnwmxielkny.functions.supabase.co/register/send", {
-				method: "POST",
-				body: JSON.stringify({ email, name, lat: pos.lat, lng: pos.lng, captcha: captchaCode }),
+			const response = await supabase.functions.invoke("register", {
+				body: { email, name, lat: pos.lat, lng: pos.lng, captcha: captchaCode },
 				headers: {
-					"Content-Type": "application/json",
-					"Access-Control-Request-Method": "POST",
-					"Authorization": "Bearer " + import.meta.env.VITE_SUPABASE_ANON_KEY,
-					"Access-Control-Request-Headers": "Content-Type, Authorization"
+					//"Content-Type": "application/json",
+					//"Access-Control-Request-Method": "POST",
+					//"Authorization": "Bearer " + import.meta.env.VITE_SUPABASE_ANON_KEY,
+					//"Access-Control-Request-Headers": "Content-Type, Authorization, apikey"
 				},
 			});
 			console.dir(response);
-			if (response.status === 200) {
+			if (response.data.status === 200) {
 				// If the response is ok than show the success alert
 				alert("Success! You will receive an email shortly.");
 			} else {
 				// Else throw an error with the message returned
 				// from the API
-				const { error } = await response.json();
+				const { error } = response.error;
 				throw new Error(error.message);
 			}
 		} catch (error: any) {
