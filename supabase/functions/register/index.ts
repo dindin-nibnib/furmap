@@ -30,13 +30,13 @@ serve(async (req: Request): Handler => {
 	const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 
 	const supabase = createClient(supabaseUrl, supabaseAnonKey, { db: { schema: "public" } });
-	const body = await req.json();
 
-	const taskPattern = new URLPattern({ pathname: '/register/:id' });
-	const matchingPath = taskPattern.exec(url);
+	const idPattern = new URLPattern({ pathname: '/register/:id' });
+	const matchingPath = idPattern.exec(url);
 	const id = matchingPath ? matchingPath.pathname.groups.id : null;
 
 	if (id === "send") {
+		const body = await req.json();
 		const { email, name, lat, lng, captcha } = body;
 
 		if (!email || !captcha || !name || !lat || !lng) {
@@ -128,8 +128,11 @@ serve(async (req: Request): Handler => {
 			},
 		);
 	} else if (id === "verify") {
-		const { key, name, lat, lng, email } = body;
-
+		const key = new URL(req.url).searchParams.get("key");
+		const name = new URL(req.url).searchParams.get("name");
+		const lat = new URL(req.url).searchParams.get("lat");
+		const lng = new URL(req.url).searchParams.get("lng");
+		const email = new URL(req.url).searchParams.get("email");
 		if (!key || !name || !lat || !lng || !email) {
 			return new Response(JSON.stringify({
 				message: "Unproccesable request, please provide the required fields",
@@ -156,6 +159,7 @@ serve(async (req: Request): Handler => {
 		}
 
 		const { data } = await supabase.from('markers').select('name').eq('email', email);
+		console.log(data);
 		if (data.length > 0) {
 			return new Response(JSON.stringify({ message: "Email already exists" }), {
 				status: 400,
