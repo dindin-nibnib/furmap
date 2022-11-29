@@ -78,8 +78,7 @@ const Register = () => {
 					//"Access-Control-Request-Headers": "Content-Type, Authorization, apikey"
 				},
 			});
-			console.dir(response);
-			if (response.data.status === 200) {
+			if (!response.error) {
 				// If the response is ok than show the success alert
 				alert("Success! You will receive an email shortly.");
 			} else {
