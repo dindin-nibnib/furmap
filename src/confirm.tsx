@@ -8,24 +8,23 @@ const Confirm = () => {
 	const [confirmed, setConfirmed] = useState<boolean | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	useEffect(() => {
-		supabase.functions.invoke("verify");
-		console.log("effect!");
-		fetch(`https://${import.meta.env.VITE_PROJECT_ID}.functions.supabase.co/register/verify${route.search}`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				"Access-Control-Request-Method": "GET",
-				"Authorization": "Bearer " + import.meta.env.VITE_SUPABASE_ANON_KEY,
-				"Access-Control-Request-Headers": "Content-Type, Authorization"
-			},
-		}).then(async (response) => {
-			if (response.status === 200) {
-				setConfirmed(true);
-			} else {
-				setConfirmed(false);
-				setError((await response.json()).message);
+		let body = {} as { [index: string]: string; };
+		for (let param of route.search.slice(1).split("&")) {
+			body[param.split("=")[0]] = param.split("=")[1];
+		}
+		supabase.functions.invoke("verify", {
+			body: {
+				...body
 			}
-		});
+		})
+			.then(async (response) => {
+				if (!response.error) {
+					setConfirmed(true);
+				} else {
+					setConfirmed(false);
+					setError((await response.error.context.json()).message);
+				}
+			});
 	}, []);
 
 	return (

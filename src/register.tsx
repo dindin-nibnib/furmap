@@ -71,12 +71,6 @@ const Register = () => {
 		try {
 			const response = await supabase.functions.invoke("register", {
 				body: { email, name, lat: pos.lat, lng: pos.lng, captcha: captchaCode },
-				headers: {
-					//"Content-Type": "application/json",
-					//"Access-Control-Request-Method": "POST",
-					//"Authorization": "Bearer " + import.meta.env.VITE_SUPABASE_ANON_KEY,
-					//"Access-Control-Request-Headers": "Content-Type, Authorization, apikey"
-				},
 			});
 			if (!response.error) {
 				// If the response is ok than show the success alert

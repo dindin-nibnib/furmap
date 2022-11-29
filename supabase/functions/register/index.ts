@@ -32,10 +32,6 @@ serve(async (req: Request): Promise<Response> => {
 
 	const supabase = createClient(supabaseUrl, supabaseAnonKey, { db: { schema: "public" } });
 
-	const idPattern = new URLPattern({ pathname: '/register/:id' });
-	const matchingPath = idPattern.exec(url);
-	const id = matchingPath ? matchingPath.pathname.groups.id : null;
-
 	const body = await req.json();
 	const { email, name, lat, lng, captcha } = body;
 
